@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Improver</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/mark.js/dist/mark.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Text Improver</h1>
+    <p>Upload a text file or directly type/paste your text</p>
+
+    <div class="upload-section">
+      <input type="file" id="file-input" accept=".txt">
+      <div class="button-container">
+        <button id="analyze-btn">Highlight Phrases Needing Improvement</button>
+        <button id="improve-btn">Get Improved Text</button>
+      </div>
+    </div>
+
+    <div class="error" id="error-message"></div>
+
+    <div id="issues-summary"></div>
+
+    <div class="text-container">
+      <div id="text-display" contenteditable="true"></div>
+      <div id="suggestion-panel">
+        <button id="close-suggestion">×</button>
+        <div id="suggestion-content"></div>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <h3>How to Use:</h3>
+      <ol>
+        <li>Upload a .txt file</li>
+        <li>Click the "Highlight Phrases Needing Improvement" button</li>
+        <li>Phrases that could be improved will be highlighted in yellow</li>
+        <li>Click on any highlighted phrase to see specific suggestions</li>
+        <li>Edit the text directly in the box or apply suggested changes</li>
+        <li>Or click "Get Improved Text" to automatically improve the entire text</li>
+        <li>Use the "Show Before & After Comparison" button to see what was changed</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
