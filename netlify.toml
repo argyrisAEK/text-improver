@@ -1,0 +1,6 @@
+[build]
+  # The folder where your Netlify functions are located
+  functions = "functions"
+
+  # The publish directory (where your static files are located)
+  publish = "/"
