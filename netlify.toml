@@ -1,3 +1,28 @@
-[functions]
-  node_bundler = "esbuild"
-  timeout = 30
+[build]
+  # Specify the base directory for the build (if your app is in a subfolder)
+  base = "/"
+
+  # Specify the publish directory (where the built files are located)
+  publish = "."
+
+  # Specify the directory where your Netlify Functions are located
+  functions = "functions"
+
+  # Environment variables (if needed)
+  [build.environment]
+    NODE_VERSION = "18"  # Specify the Node.js version
+
+# Configure redirects (optional)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Configure headers (optional)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
