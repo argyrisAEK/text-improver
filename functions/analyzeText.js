@@ -1,6 +1,7 @@
 
 const fetch = require('node-fetch');
-exports.handler = async (event, context) => {
+
+exports.handler = async (event) => {
   const { text } = JSON.parse(event.body);
 
   try {
@@ -12,8 +13,8 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         messages: [
           {
-            role: "system",
-                content: `You are a professional writing coach and editor. Analyze the provided text and identify phrases that could be improved.
+            role: 'system',
+                 content: `You are a professional writing coach and editor. Analyze the provided text and identify phrases that could be improved.
             Focus on issues like:
             - Passive voice constructions (e.g., "mistakes were made" → "they made mistakes")
             - Jargon or technical terms that aren't clearly explained
@@ -34,36 +35,29 @@ exports.handler = async (event, context) => {
                 "exact phrase": {"issue": "Clear description of the writing problem", "suggestion": "Provide only the improved wording"},
                 ...
               },
-              "summary": "Brief analysis of writing patterns with constructive feedback"
-            }`       
+              "summary": "Brief analysis(max: 20 words) of writing patterns with constructive feedback"
+            }`
           },
           {
-            role: "user",
-            content: text
-          }
+            role: 'user',
+            content: text,
+          },
         ],
-        model: "openai-large",
+        model: 'openai-large',
         jsonMode: true,
-        private: true
+        private: true,
       }),
     });
 
-    if (!response.ok) {
-      return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: 'Failed to analyze text with AI' }),
-      };
-    }
-
-    const result = await response.json();
+    const data = await response.json();
     return {
       statusCode: 200,
-      body: JSON.stringify(result),
+      body: JSON.stringify(data),
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Internal server error' }),
+      body: JSON.stringify({ error: 'Failed to analyze text' }),
     };
   }
 };
