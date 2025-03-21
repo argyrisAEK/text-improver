@@ -1,10 +1,15 @@
 exports.handler = async (event, context) => {
-  console.log('Received event:', JSON.stringify(event, null, 2));
-
   const { text } = JSON.parse(event.body);
-  console.log('Text to improve:', text);
 
-  try {
+  // Define the models in order of preference
+  const MODELS = [
+    "openai-large", // Primary model
+    "llama",        // First fallback
+    "mistral"      // Second fallback
+  ];
+
+  // Function to call the API with a specific model
+  const callAPI = async (model) => {
     const response = await fetch('https://text.pollinations.ai/', {
       method: 'POST',
       headers: {
@@ -38,36 +43,43 @@ exports.handler = async (event, context) => {
             content: text
           }
         ],
-        model: "openai-large",
+        model: model,
         private: true
       })
     });
 
     if (!response.ok) {
-      console.error('API Error:', response.status, response.statusText);
       throw new Error(`API returned ${response.status}: ${response.statusText}`);
     }
 
-    const improvedText = await response.text();
-    console.log('Improved Text:', improvedText);
+    return await response.text();
+  };
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: improvedText,
-    };
-  } catch (error) {
-    console.error('Function Error:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify({ error: error.message }),
-    };
+  // Try each model in order
+  for (let i = 0; i < MODELS.length; i++) {
+    const model = MODELS[i];
+    try {
+      console.log(`Trying model: ${model}`);
+      const improvedText = await callAPI(model);
+
+      // If successful, return the result
+      return {
+        statusCode: 200,
+        body: improvedText,
+      };
+    } catch (error) {
+      console.error(`Error with model ${model}:`, error.message);
+
+      // If this is the last model, throw the error
+      if (i === MODELS.length - 1) {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: "All models failed. Please try again later." }),
+        };
+      }
+
+      // Otherwise, continue to the next model
+      console.log(`Switching to fallback model: ${MODELS[i + 1]}`);
+    }
   }
 };
