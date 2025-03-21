@@ -74,28 +74,28 @@ document.addEventListener('DOMContentLoaded', () => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   }
 
-  async function analyzeTextWithLLM(text) {
-    try {
-      const response = await fetch('/.netlify/functions/analyzeText', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text }),
-      });
+async function analyzeTextWithLLM(text) {
+  try {
+    const response = await fetch('/.netlify/functions/analyzeText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
 
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      localStorage.setItem('lastAnalysis', JSON.stringify(result));
-      return result;
-    } catch (error) {
-      console.error('Error:', error.message);
-      throw error;
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}: ${response.statusText}`);
     }
+
+    const result = await response.json();
+    localStorage.setItem('lastAnalysis', JSON.stringify(result));
+    return result;
+  } catch (error) {
+    console.error('Error:', error.message);
+    throw error;
   }
+}
 
   function highlightPhrases(phrases) {
     const instance = new Mark(textDisplay);
