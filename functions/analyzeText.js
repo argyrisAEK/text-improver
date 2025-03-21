@@ -1,7 +1,15 @@
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
   const { text } = JSON.parse(event.body);
 
-  try {
+  // Define the models in order of preference
+  const MODELS = [
+    "openai-large", // Primary model
+    "llama",        // First fallback
+    "mistral"      // Second fallback
+  ];
+
+  // Function to call the API with a specific model
+  const callAPI = async (model) => {
     const response = await fetch('https://text.pollinations.ai/', {
       method: 'POST',
       headers: {
@@ -40,21 +48,44 @@ exports.handler = async (event) => {
             content: text,
           },
         ],
-        model: 'openai-large',
+        model: model,
         jsonMode: true,
-        private: true,
-      }),
+        private: true
+      })
     });
 
-    const data = await response.json();
-    return {
-      statusCode: 200,
-      body: JSON.stringify(data),
-    };
-  } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to analyze text' }),
-    };
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+  };
+
+  // Try each model in order
+  for (let i = 0; i < MODELS.length; i++) {
+    const model = MODELS[i];
+    try {
+      console.log(`Trying model: ${model}`);
+      const result = await callAPI(model);
+
+      // If successful, return the result
+      return {
+        statusCode: 200,
+        body: JSON.stringify(result),
+      };
+    } catch (error) {
+      console.error(`Error with model ${model}:`, error.message);
+
+      // If this is the last model, throw the error
+      if (i === MODELS.length - 1) {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: "All models failed. Please try again later." }),
+        };
+      }
+
+      // Otherwise, continue to the next model
+      console.log(`Switching to fallback model: ${MODELS[i + 1]}`);
+    }
   }
 };
