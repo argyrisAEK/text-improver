@@ -73,8 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function countWords(text) {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
   }
-
-async function analyzeTextWithLLM(text) {
+async function analyzeTextWithLLM(text, retries = 3) {
   try {
     const response = await fetch('/.netlify/functions/analyzeText', {
       method: 'POST',
@@ -92,8 +91,14 @@ async function analyzeTextWithLLM(text) {
     localStorage.setItem('lastAnalysis', JSON.stringify(result));
     return result;
   } catch (error) {
-    console.error('Error:', error.message);
-    throw error;
+    if (retries > 0) {
+      console.log(`Retrying... Attempts left: ${retries}`);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second before retrying
+      return analyzeTextWithLLM(text, retries - 1);
+    } else {
+      console.error('Error:', error.message);
+      throw error;
+    }
   }
 }
 
