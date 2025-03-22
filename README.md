@@ -13,7 +13,7 @@ The **Text Improver App** is a web application that helps users analyze and impr
 
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: Netlify Functions (Serverless)
-- **External API**: [Pollinations.ai](https://text.pollinations.ai/) for text analysis and improvement
+- **External API**: [Pollinations.ai](https://pollinations.ai/) for text analysis and improvement
 - **Libraries**: [mark.js](https://markjs.io/) for text highlighting
 
 ## Live Demo
